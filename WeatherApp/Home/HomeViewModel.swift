@@ -86,9 +86,9 @@ class HomeViewModel:ObservableObject{
 extension HomeViewModel{
     
     private func handleErrors(error:NetworkingError) async{
-        await MainActor.run{
+//        await MainActor.run{
             self.responseError = await Helper.handleErrors(error: error)
-        }
+//        }
     }
     
     private func getImage(of response:String)->String{
