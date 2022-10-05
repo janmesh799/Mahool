@@ -25,130 +25,167 @@ enum image{
 }
 
 struct HomeView: View {
-//    let state:ViewState = .sucess
-    @StateObject var VM = HomeViewModel()
-//    @Environment(\.colorScheme) var colorScheme
-    @State var isprre:Bool = false
+    
+    @StateObject var viewModel = HomeViewModel()
+    @State var cancelSearch:Bool = false
+    @State var showAbout:Bool = false
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            switch VM.state {
-                
-            case .sucess:
-                VStack{
-//                    MARK: Header
-                    HStack{
-                        Image(systemName:"info.circle")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 25, height: 25, alignment: .center)
-                            .padding(.leading)
-                            .onTapGesture {
-                                isprre.toggle()
-                            }.sheet(isPresented: $isprre) {
-                                print("Dismissed to sheet")
-                            } content: {
-                                Text("Hello")
-                            }
-
-                        Spacer()
-                        
-                        Text("माहोल")
-                            .fontWeight(.bold)
-                            .font(.custom("d", fixedSize: 45))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "sun.max.circle")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 25, height: 25, alignment: .center)
-                            .padding(.trailing)
-                            .onTapGesture {
-//                                self.toggleColorScheme()
-                            }
-                    }.padding(.top,20)
-                    
-                    TextField("Search City", text: $VM.userInput) { edit in
-                        if edit{
-                            print("editing")
-                        }
-                        else{
-                            print("not editing")
-                        }
-                    } onCommit: {
-                        if VM.userInput.count > 3{
-                            VM.getWeatherData()
-                            VM.state = .loading
-                            VM.userInput = ""
-                        }
-                        
-                    }
-                    .padding()
-                    .background(Color.gray.opacity(0.3).cornerRadius(10))
-                    .padding(.horizontal)
-                    .disableAutocorrection(true)
-                    .textCase(.uppercase)
-//                    .textInputAutocapitalization(.characters)
-             
-//                    MARK: Temperature
-                    Text("\(VM.temps)℃")
-                        .font(.custom("dfg", fixedSize: 50))
-                        .fontWeight(.semibold)
-//                   MARK: Weather Description
-                    Text("\(VM.data?.weather?.first!.weatherDescription ?? "XYX")")
-                        .font(.title)
-//                    MARK: Weather Image
-                    Image(systemName: VM.img)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 170, height: 170, alignment: .center)
-                        .padding()
-                    
-                    Spacer()
-//                    MARK: Location
-                    HStack {
-                        Image(systemName: "location.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20, alignment: .center)
-                            .foregroundColor(.blue)
-                        
-                        Text("\(VM.cityName), \(VM.country)")
-                            .font(.title)
-                    }
-                    
-                    Spacer()
-                    
-
-                    VStack(alignment:.leading){
-                        MoreDetailView(entryName: "Max Temperature", data: "\(round(((VM.data?.main?.tempMax ?? 259.21)-273.15)*100)/100)")
-                        MoreDetailView(entryName: "Min Temperature", data: "\(round(((VM.data?.main?.tempMin ?? 259.21)-273.15)*100)/100)")
-                        MoreDetailView(entryName: "Pressure", data: "\(VM.data?.main?.pressure ?? 69) hPa")
-                        MoreDetailView(entryName: "Humidity", data: "\(VM.data?.main?.humidity ?? 69)%")
-//                        MoreDetailView(entryName: "Sea Level", data: "\(VM.data?.main. ?? 6.9)")
-//                        MoreDetailView(entryName: "Ground Level", data: "39")
-                        MoreDetailView(entryName: "Wind Speed", data: "\(VM.data?.wind?.speed ?? 6.9)m/sec")
-                    }
-                    .padding(.vertical,30)
-                    .background(Color.pink.opacity(0.1).cornerRadius(10))
-                    .padding(.horizontal,10)
-                    .padding(.vertical,10)
+            ZStack{
+                if(viewModel.isLoading){
+                    HomeLoadingView(cancelSearch: $cancelSearch)
                 }
-                
-            case .failure:
-                ErrorView(vm: VM)
-            case .loading:
-                HomeLoadingView()
-            case .notFound:
-                Text("Not find city")
+                else{
+                    VStack{
+                        header
+                        
+                        searchBar
+                        
+                        homeBody
+                        
+                        Spacer()
+                        
+                        stats
+                    }
+                    .disabled(viewModel.isLoading)
+                }
+
             }
         }
+        .alert(self.viewModel.responseError, isPresented: $viewModel.showAlert, actions: {
+            Button("Ok") {
+                self.viewModel.showAlert = false
+                self.viewModel.isLoading = false
+            }
+        })
         .onTapGesture {
             self.hideKeyboard()
+        }
+        .onChange(of: self.cancelSearch) { newValue in
+            if(newValue){
+                self.viewModel.isLoading = false
+                self.viewModel.showAlert = false
+                self.viewModel.userInput = ""
+            }
         }
     }
 }
 
+
+extension HomeView{
+    ///Header
+    var header:some View{
+        HStack{
+            Image(systemName:"info.circle")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 25, height: 25, alignment: .center)
+                .padding(.leading)
+                .onTapGesture {
+                    showAbout.toggle()
+                }.sheet(isPresented: $showAbout) {
+                    print("Dismissed to sheet")
+                } content: {
+                    Text("Hello")
+                }
+
+            Spacer()
+            
+            Text("माहोल")
+                .fontWeight(.bold)
+                .font(.custom("d", fixedSize: 45))
+            
+            Spacer()
+            
+            Image(systemName: "sun.max.circle")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 25, height: 25, alignment: .center)
+                .padding(.trailing)
+                .onTapGesture {
+//                                self.toggleColorScheme()
+                }
+        }.padding(.top,20)
+    }
+    
+    var searchBar:some View{
+        TextField("Search City", text: $viewModel.userInput) { edit in
+            if edit{
+                print("editing")
+            }
+            else{
+                print("not editing")
+            }
+        } onCommit: {
+            if viewModel.userInput.count > 3{
+                Task{
+                    await viewModel.getWeatherData()
+                    viewModel.userInput = ""
+                }
+//                            viewModel.state = .loading
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.3).cornerRadius(10))
+        .padding(.horizontal)
+        .disableAutocorrection(true)
+        .textCase(.uppercase)
+//                    .textInputAutocapitalization(.characters)
+    }
+    
+    
+    /// Temperature, Description, Image & Location
+    var homeBody:some View{
+        VStack{
+            //Temp
+            Text("\(viewModel.weatherData.temp)℃")
+                .font(.custom("dfg", fixedSize: 50))
+                .fontWeight(.semibold)
+            
+            // Weather Description
+            Text("\(viewModel.weatherData.description)")
+                .font(.title)
+            
+            //Weather Image
+            Image(systemName: viewModel.weatherData.image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 170, height: 170, alignment: .center)
+                .padding()
+            
+            Spacer()
+            
+            //Location
+            HStack {
+                Image(systemName: "location.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20, height: 20, alignment: .center)
+                    .foregroundColor(.blue)
+                
+                //City & Country Name
+                Text("\(viewModel.weatherData.cityName), \(viewModel.weatherData.country)")
+                    .font(.title)
+            }
+        }
+    }
+    ///Stats
+    var stats:some View{
+        VStack(alignment:.leading){
+            MoreDetailView(entryName: "Max Temperature", data: self.viewModel.weatherData.maxTemp)
+            MoreDetailView(entryName: "Min Temperature", data: self.viewModel.weatherData.minTemp)
+            MoreDetailView(entryName: "Pressure", data: self.viewModel.weatherData.pressure)
+            MoreDetailView(entryName: "Humidity", data: self.viewModel.weatherData.humidity)
+            MoreDetailView(entryName: "Wind Speed", data: self.viewModel.weatherData.windSpeed)
+        }
+        .padding(.vertical,30)
+        .background(Color.pink.opacity(0.1).cornerRadius(10))
+        .padding(.horizontal,10)
+        .padding(.vertical,10)
+    }
+    
+    
+}
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
@@ -157,21 +194,4 @@ struct HomeView_Previews: PreviewProvider {
     }
 }
 
-struct MoreDetailView:View{
-    let entryName:String
-    let data:String
-    var body: some View{
-        VStack {
-            HStack{
-                Text("\(entryName):")
-                    
-                Spacer()
-                
-                Text(data)
-            }
-            .font(.headline)
-        .padding(.horizontal)
-            Divider()
-        }
-    }
-}
+

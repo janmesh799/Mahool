@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeLoadingView: View {
     
     @State var citySearch:String = ""
+    @Binding var cancelSearch:Bool
     var body: some View {
         VStack{
             HStack{
@@ -30,6 +31,12 @@ struct HomeLoadingView: View {
                 Text("Loading Please Wait")
             }
             
+            
+            Button("Cancel Seach") {
+                self.cancelSearch = true
+            }
+//            .buttonStyle(.borderedProminent)
+            
             Spacer()
         }
     }
@@ -37,6 +44,6 @@ struct HomeLoadingView: View {
 
 struct HomeLoadingView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeLoadingView()
+        HomeLoadingView(cancelSearch: .constant(true))
     }
 }

@@ -14,127 +14,151 @@ enum ViewState{
     case notFound
 }
 
+struct WeatherData{
+    var temp:String
+    var country:String
+    var cityName:String
+    var image:String
+    var description:String
+    
+    var minTemp:String
+    var maxTemp:String
+    var pressure:String
+    var humidity:String
+    var windSpeed:String
+}
 class HomeViewModel:ObservableObject{
-    //input
+    
+    let networkingManager = NetworkingManager()
+    
     @Published var userInput:String = ""
+    @Published var weatherData:WeatherData = WeatherData(temp: "69", country: "--", cityName: "Bikaner", image: "bolt.fill",description: "Description",minTemp: "",maxTemp: "",pressure: "",humidity: "",windSpeed: "")
     
-    //response
-    @Published var cityName:String = "Bikaner"
-    @Published var temps:String = "69"
-    @Published var description:String = "Description"
-    @Published var country:String = "XX"
-    @Published var img:String = "bolt.fill"
-    @Published var data:HomeModel?
+    @Published var responseError:String = ""
+    @Published var isLoading:Bool = false
+    @Published var showAlert:Bool = false
     
     
-    @Published var state:ViewState = .sucess
-    let vm = Networking()
-    func getWeatherData(){
-        
-        vm.Networking(city: userInput) { [weak self] (result:Result<HomeModel,networkingError>) in
-            switch result {
-            case .success(let success):
-                
-                DispatchQueue.main.async {
-                    let temp = success.main?.temp ?? 69
-
-                    self?.temps = "\(round((temp-273.15)*100)/100)"
-                    self?.description = success.weather?.first?.main ?? "-"
-                    self?.cityName = success.name ?? "--"
-                    self?.country = success.sys?.country ?? "Hot"
-                    self?.state = .sucess
-                    self?.img = success.weather?.first?.main ?? "aqi.low"
-
-                    self?.data = success
-//                    data?.main?.tempMax = round((temp-273.15)*100)/100
-                    switch success.weather?.first?.main{
-                    case "clear sky":
-                        self?.img = "sun.max.fill"
-                           
-                    case "few clouds":
-                        self?.img = "cloud.sun.rain"
-
-                    case "scattered clouds":
-                        self?.img = "cloud.fill"
-                            
-                    case "broken clouds":
-                        self?.img = "cloud.fill"
-
-                    case "shower rain":
-                        self?.img = "cloud.rain.rain"
-
-                    case "rain":
-                        self?.img = "cloud.heavyrain.fill"
-
-                    case "thunderstorm":
-                        self?.img = "cloud.bolt.rain.fill"
     
-                    case "snow":
-                        self?.img = "cloud.snow.fill"
-
-                    case "mist":
-                        self?.img = "cloud.fog.fill"
-
-                    case "Drizzle":
-                        self?.img = "cloud.drizzle.fill"
-
-                    case "Rain":
-                        self?.img = "cloud.bolt.rain.fill"
-
-                    case "Smoke":
-                        self?.img = "smoke.fill"
-
-                    case "Haze":
-                        self?.img = "cloud.fog.fill"
-
-                    case "Dust":
-                        self?.img = "sun.dust.fill"
-
-                    case "Fog":
-                        self?.img = "cloud.fog.fill"
-
-                    case "Ash":
-                        self?.img = "sun.dust"
-
-                    case "Sand":
-                        self?.img = "sun.dust.fill"
-
-                    case "Squall":
-                        self?.img = "wind"
-                            
-                    case "Tornado":
-                        self?.img = "tornado"
-
-                    case "Clear":
-                        self?.img = "sun.min.fill"
-
-                    case "Clouds":
-                        self?.img = "cloud.fill"
-
-                    default:
-                        self?.img = "sun.max.fill"
-
-                    }
+    func getWeatherData() async{
+        await MainActor.run{
+            self.isLoading = true
+        }
+        do{
+            let result = try await networkingManager.getJSON(url: "https://api.openweathermap.org/data/2.5/weather?q=\(userInput)&appid=40e22274d96b307af48ca2883d88a538", type: HomeModel.self)
+            if(result.cod == 404){
+                await MainActor.run{
+                    self.showAlert = true
                 }
-                
-            case .failure(let failure):
-                DispatchQueue.main.async {
-                    switch failure{
-                    case .notFound:
-                        self?.state = .notFound
-                    case .invalidInput:
-                        self?.state = .failure
-                    case .invalidURL:
-                        self?.state = .failure
-                    case .badResponse:
-                        self?.state = .failure
-                    case .error:
-                        self?.state = .failure
-                    case .nilData:
-                        self?.state = .notFound
-                    }
-                }
+                throw NetworkingError.invalidInput
             }
+            await MainActor.run{
+                self.weatherData.temp = "\(result.main?.temp ?? 69)"
+                self.weatherData.cityName = result.name ?? "-"
+                self.weatherData.country = result.sys?.country ?? "-"
+                self.weatherData.image = getImage(of: result.weather?.first?.main ?? "")
+                self.weatherData.description = result.weather?.first?.main ?? "Description"
+                self.weatherData.minTemp = "\(round(((result.main?.tempMin ?? 259.21)-273.15)*100)/100)"
+                self.weatherData.maxTemp = "\(round(((result.main?.tempMax ?? 259.21)-273.15)*100)/100)"
+                self.weatherData.pressure = "\(result.main?.pressure ?? 69) hPa"
+                self.weatherData.humidity = "\(result.main?.humidity ?? 69)%"
+                self.weatherData.windSpeed = "\(result.wind?.speed ?? 6.9)m/sec"
+            }
+            
+            await MainActor.run{
+                self.isLoading = false
+            }
+        }
+        catch(let err){
+            await handleErrors(error: err as! NetworkingError)
+            await MainActor.run {
+                self.isLoading = false
+                self.showAlert = true
+            }
+            print("Error: \(err.localizedDescription)")
+        }
+    }
+}
+
+
+
+
+extension HomeViewModel{
+    
+    private func handleErrors(error:NetworkingError) async{
+        await MainActor.run{
+            self.responseError = await Helper.handleErrors(error: error)
+        }
+    }
+    
+    private func getImage(of response:String)->String{
+        switch response{
+        case "clear sky":
+            return "sun.max.fill"
+               
+        case "few clouds":
+            return "cloud.sun.rain"
+
+        case "scattered clouds":
+            return "cloud.fill"
+                
+        case "broken clouds":
+            return "cloud.fill"
+
+        case "shower rain":
+            return "cloud.rain.rain"
+
+        case "rain":
+            return "cloud.heavyrain.fill"
+
+        case "thunderstorm":
+            return "cloud.bolt.rain.fill"
+
+        case "snow":
+            return "cloud.snow.fill"
+
+        case "mist":
+            return "cloud.fog.fill"
+
+        case "Drizzle":
+            return "cloud.drizzle.fill"
+
+        case "Rain":
+            return "cloud.bolt.rain.fill"
+
+        case "Smoke":
+            return "smoke.fill"
+
+        case "Haze":
+            return "cloud.fog.fill"
+
+        case "Dust":
+            return "sun.dust.fill"
+
+        case "Fog":
+            return "cloud.fog.fill"
+
+        case "Ash":
+            return "sun.dust"
+
+        case "Sand":
+            return "sun.dust.fill"
+
+        case "Squall":
+            return "wind"
+                
+        case "Tornado":
+            return "tornado"
+
+        case "Clear":
+            return "sun.min.fill"
+
+        case "Clouds":
+            return "cloud.fill"
+
+        default:
+            return "sun.max.fill"
+
         }
     }
 }
