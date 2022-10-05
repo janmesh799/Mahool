@@ -41,7 +41,7 @@ struct ErrorView: View {
                 .font(.headline)
                 
             Button {
-                vm.state = .sucess
+//                vm.state = .sucess
             } label: {
                 Text("Retry")
                     .font(.title2)

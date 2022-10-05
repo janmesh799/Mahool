@@ -17,6 +17,10 @@
 		571C5EA2279291880040C357 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571C5EA1279291880040C357 /* ErrorView.swift */; };
 		571C5EA5279297D10040C357 /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571C5EA4279297D10040C357 /* Networking.swift */; };
 		57C603ED279313050017E9C0 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C603EC279313050017E9C0 /* OnBoardingView.swift */; };
+		B0554BC928EE11F2008CBB92 /* NetworkingProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0554BC828EE11F2008CBB92 /* NetworkingProtocols.swift */; };
+		B0554BCB28EE12B8008CBB92 /* NetworkingErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0554BCA28EE12B8008CBB92 /* NetworkingErrors.swift */; };
+		B0554BCE28EE291F008CBB92 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0554BCD28EE291F008CBB92 /* Helper.swift */; };
+		B0554BD128EE2F16008CBB92 /* MoreDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0554BD028EE2F16008CBB92 /* MoreDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +35,10 @@
 		571C5EA1279291880040C357 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		571C5EA4279297D10040C357 /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
 		57C603EC279313050017E9C0 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
+		B0554BC828EE11F2008CBB92 /* NetworkingProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingProtocols.swift; sourceTree = "<group>"; };
+		B0554BCA28EE12B8008CBB92 /* NetworkingErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingErrors.swift; sourceTree = "<group>"; };
+		B0554BCD28EE291F008CBB92 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		B0554BD028EE2F16008CBB92 /* MoreDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +71,8 @@
 		571C5E842791E55B0040C357 /* WeatherApp */ = {
 			isa = PBXGroup;
 			children = (
+				B0554BCF28EE2EF8008CBB92 /* ReusableViews */,
+				B0554BCC28EE2918008CBB92 /* Helper */,
 				57C603E9279312730017E9C0 /* OnBoarding */,
 				571C5EA32792979E0040C357 /* Networking */,
 				571C5E9E27928EC80040C357 /* Loading */,
@@ -105,6 +115,8 @@
 			isa = PBXGroup;
 			children = (
 				571C5EA4279297D10040C357 /* Networking.swift */,
+				B0554BC828EE11F2008CBB92 /* NetworkingProtocols.swift */,
+				B0554BCA28EE12B8008CBB92 /* NetworkingErrors.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -115,6 +127,22 @@
 				57C603EC279313050017E9C0 /* OnBoardingView.swift */,
 			);
 			path = OnBoarding;
+			sourceTree = "<group>";
+		};
+		B0554BCC28EE2918008CBB92 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				B0554BCD28EE291F008CBB92 /* Helper.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		B0554BCF28EE2EF8008CBB92 /* ReusableViews */ = {
+			isa = PBXGroup;
+			children = (
+				B0554BD028EE2F16008CBB92 /* MoreDetailView.swift */,
+			);
+			path = ReusableViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,14 +215,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0554BCE28EE291F008CBB92 /* Helper.swift in Sources */,
+				B0554BCB28EE12B8008CBB92 /* NetworkingErrors.swift in Sources */,
 				571C5E862791E55B0040C357 /* WeatherAppApp.swift in Sources */,
 				571C5E952791E5BE0040C357 /* HomeModel.swift in Sources */,
 				571C5EA5279297D10040C357 /* Networking.swift in Sources */,
 				571C5EA027928ED80040C357 /* HomeLoadingView.swift in Sources */,
 				571C5E9B279285D60040C357 /* HomeView.swift in Sources */,
 				57C603ED279313050017E9C0 /* OnBoardingView.swift in Sources */,
+				B0554BD128EE2F16008CBB92 /* MoreDetailView.swift in Sources */,
 				571C5E972791E7980040C357 /* HomeViewModel.swift in Sources */,
 				571C5EA2279291880040C357 /* ErrorView.swift in Sources */,
+				B0554BC928EE11F2008CBB92 /* NetworkingProtocols.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,9 +363,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -341,9 +373,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mohan.WeatherApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -361,9 +396,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -371,9 +406,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Mohan.WeatherApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
